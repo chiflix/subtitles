@@ -17,6 +17,8 @@ func (subtitle *Subtitle) FilterCaptions(filter string) {
 		subtitle.filterHTML()
 	case "ocr":
 		subtitle.filterOCR()
+	case "style":
+		subtitle.filterStyle()
 	case "none":
 	default:
 		fmt.Printf("Unrecognized filter name: %s\n", filter)

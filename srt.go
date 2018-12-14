@@ -11,6 +11,7 @@ import (
 
 // Eol is the end of line characters to use when writing .srt data
 var eol = "\n"
+
 func init() {
 	if runtime.GOOS == "windows" {
 		eol = "\r\n"
@@ -31,15 +32,15 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 	outSeq := 1
 
 	for i := 0; i < len(lines); i++ {
-		seq := strings.Trim(lines[i], "\r ")
+		seq := strings.TrimSpace(lines[i])
 		if seq == "" {
 			continue
 		}
 
 		_, err := strconv.Atoi(seq)
 		if err != nil {
-			err = fmt.Errorf("srt: atoi error at line %d: %v", i, err)
-			break
+			// we can ignore atoi error at line
+			err = nil
 		}
 
 		var o Caption

@@ -83,7 +83,7 @@ var (
 func (subtitle *Subtitle) RemoveAds() *Subtitle {
 	seq := 1
 	res := []Caption{}
-	for orgSeq, sub := range subtitle.Captions {
+	for _ /* orgSeq */, sub := range subtitle.Captions {
 		isAd := false
 		for _, line := range sub.Text {
 			x := strings.ToLower(line)

@@ -1,8 +1,6 @@
 package subtitles
 
 import (
-	log "github.com/Sirupsen/logrus"
-
 	"github.com/kennygrant/sanitize"
 )
 
@@ -12,7 +10,7 @@ func (subtitle *Subtitle) filterHTML() *Subtitle {
 		for i, line := range cap.Text {
 			clean := sanitize.HTML(line)
 			if clean != cap.Text[i] {
-				log.Println("[html]", cap.Text[i], "->", clean)
+				// log.Println("[html]", cap.Text[i], "->", clean)
 				cap.Text[i] = clean
 			}
 		}

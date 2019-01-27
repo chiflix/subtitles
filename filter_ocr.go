@@ -4,8 +4,6 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 var (
@@ -38,7 +36,7 @@ func (subtitle *Subtitle) filterOCR() *Subtitle {
 
 			s = fixOCRLineCapitalization(s)
 			if org != s {
-				log.Println("[ocr]", org, "->", s)
+				// log.Println("[ocr]", org, "->", s)
 			}
 			cap.Text[i] = s
 		}

@@ -24,4 +24,22 @@ func (subtitle *Subtitle) FilterCaptions(filter string) {
 	default:
 		fmt.Printf("Unrecognized filter name: %s\n", filter)
 	}
+	subtitle.cleanEmptyLines()
+}
+
+func (subtitle *Subtitle) cleanEmptyLines() {
+	var ret []Caption
+	for _, cap := range subtitle.Captions {
+		var lines []string
+		for _, v := range cap.Text {
+			if len(v) > 0 {
+				lines = append(lines, v)
+			}
+		}
+		if len(lines) > 0 {
+			cap.Text = lines
+			ret = append(ret, cap)
+		}
+	}
+	subtitle.Captions = ret
 }

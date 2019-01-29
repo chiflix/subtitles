@@ -14,12 +14,42 @@ func (subtitle *Subtitle) filterStyle() *Subtitle {
 			if re.MatchString(line) {
 				line = re.ReplaceAllString(line, "")
 			}
-			var err error
-			cap.Text[i], err = strconv.Unquote(`"` + line + `"`)
-			if err != nil {
-				cap.Text[i] = strings.Replace(line, "\\n", "\n", -1)
+			if isMeaningless(line) {
+				cap.Text[i] = ""
+				continue
 			}
+			line = unescapeString(line)
+			line = strings.TrimSpace(line)
+			cap.Text[i] = line
 		}
 	}
 	return subtitle
+}
+
+func isMeaningless(line string) bool {
+	arr := strings.Split(line, " ")
+	if len(arr) > 5 {
+		isnumberorsinglechar := 0
+		for _, v := range arr {
+			if len(v) == 1 {
+				isnumberorsinglechar++
+				continue
+			}
+			if _, err := strconv.Atoi(v); err == nil {
+				isnumberorsinglechar++
+			}
+		}
+		if isnumberorsinglechar == len(arr) {
+			return true
+		}
+	}
+	return false
+}
+
+func unescapeString(line string) string {
+	r, err := strconv.Unquote(`"` + line + `"`)
+	if err != nil {
+		return strings.Replace(line, "\\n", "\n", -1)
+	}
+	return r
 }

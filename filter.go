@@ -11,6 +11,7 @@ func (subtitle *Subtitle) FilterCaptions(filter string) {
 		subtitle.filterCapitalization()
 		subtitle.filterHTML()
 		subtitle.filterOCR()
+		subtitle.filterStyle()
 	case "caps":
 		subtitle.filterCapitalization()
 	case "html":

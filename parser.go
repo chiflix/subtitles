@@ -7,15 +7,21 @@ import (
 )
 
 // Parse tries to parse a subtitle
-func Parse(s string) (Subtitle, error) {
-	if looksLikeCCDBCapture(s) {
-		return NewFromCCDBCapture(s)
+func Parse(s string) (sub Subtitle, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			sub = Subtitle{}
+			err = fmt.Errorf("parse: unrecognized subtitle type")
+		}
+	}()
+	if looksLikeSRT(s) {
+		return NewFromSRT(s)
 	} else if looksLikeSSA(s) {
 		return NewFromSSA(s)
+	} else if looksLikeCCDBCapture(s) {
+		return NewFromCCDBCapture(s)
 	} else if looksLikeDCSub(s) {
 		return NewFromDCSub(s)
-	} else if looksLikeSRT(s) {
-		return NewFromSRT(s)
 	}
 	return Subtitle{}, fmt.Errorf("parse: unrecognized subtitle type")
 }

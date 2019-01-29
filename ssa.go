@@ -82,7 +82,9 @@ func parseSsaDialogue(s string, idx int, columns int) string {
 
 	s = s[pos+2:]
 	cols := strings.SplitN(s, ",", columns)
-
+	if idx >= len(cols) {
+		return ""
+	}
 	return strings.TrimSpace(cols[idx])
 }
 

@@ -7,8 +7,7 @@ import (
 )
 
 // Parse tries to parse a subtitle
-func Parse(b []byte) (Subtitle, error) {
-	s := ConvertToUTF8(b)
+func Parse(s string) (Subtitle, error) {
 	if looksLikeCCDBCapture(s) {
 		return NewFromCCDBCapture(s)
 	} else if looksLikeSSA(s) {

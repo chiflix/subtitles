@@ -28,35 +28,37 @@ func looksLikeSRT(s string) bool {
 
 // NewFromSRT parses a .srt text into Subtitle, assumes s is a clean utf8 string
 func NewFromSRT(s string) (res Subtitle, err error) {
-	r1 := regexp.MustCompile("([0-9:.,]*) --> ([0-9:.,]*)")
+	re := regexp.MustCompile("([0-9]+:[0-9]+:[0-9]+,[0-9]+)\\s+-->\\s+([0-9]+:[0-9]+:[0-9]+,[0-9]+)")
 	lines := strings.Split(s, "\n")
 	outSeq := 1
 
-	for i := 0; i < len(lines); i++ {
-		seq := strings.TrimSpace(lines[i])
-		if seq == "" {
+	for i, line := range lines {
+		matches := re.FindStringSubmatch(line)
+		if len(matches) < 3 {
+			line = strings.TrimSpace(line)
+			if len(line) == 0 {
+				continue
+			}
+			_, err := strconv.Atoi(line)
+			if err == nil {
+				// if the is no last line
+				if (i == 0 || // or the last line is empty or none
+					i > 0 && len(strings.TrimSpace(lines[i-1])) == 00) &&
+					// and the next line is timecode
+					(i+1 < len(lines) && len(re.FindStringSubmatch(lines[i+1])) >= 3) {
+					// then skip this seq number
+					continue
+				}
+			}
+			// not time codes, so it may be text
+			ll := len(res.Captions) - 1
+			if ll >= 0 {
+				res.Captions[ll].Text = append(res.Captions[ll].Text, line)
+			}
 			continue
 		}
-
-		_, err := strconv.Atoi(seq)
-		if err != nil {
-			// we can ignore atoi error at line
-			err = nil
-		}
-
 		var o Caption
 		o.Seq = outSeq
-
-		i++
-		if i >= len(lines) {
-			break
-		}
-
-		matches := r1.FindStringSubmatch(lines[i])
-		if len(matches) < 3 {
-			err = fmt.Errorf("srt: parse error at line %d (idx out of range)", i)
-			break
-		}
 
 		o.Start, err = parseTime(matches[1])
 		if err != nil {
@@ -70,34 +72,10 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 			break
 		}
 
-		i++
-		if i >= len(lines) {
-			break
-		}
-
-		textLine := 1
-		for {
-			line := strings.Trim(lines[i], "\r ")
-			if line == "" && textLine > 1 {
-				break
-			}
-			if line != "" {
-				o.Text = append(o.Text, line)
-			}
-
-			i++
-			if i >= len(lines) {
-				break
-			}
-
-			textLine++
-		}
-
-		if len(o.Text) > 0 {
-			res.Captions = append(res.Captions, o)
-			outSeq++
-		}
+		res.Captions = append(res.Captions, o)
+		outSeq++
 	}
+
 	return
 }
 

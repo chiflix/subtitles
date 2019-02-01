@@ -15,7 +15,7 @@ func Parse(s string) (sub Subtitle, err error) {
 		}
 	}()
 	if looksLikeMicroDVD(s) {
-		return NewFromMicroDVD(s, 0)
+		return NewFromMicroDVD(s, -1)
 	} else if looksLikeSRT(s) {
 		return NewFromSRT(s)
 	} else if looksLikeSSA(s) {

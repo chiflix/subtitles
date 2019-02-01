@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // Eol is the end of line characters to use when writing .srt data
@@ -33,7 +34,7 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 	outSeq := 1
 
 	for i, line := range lines {
-		matches := re.FindStringSubmatch(line)
+		matches := re.FindStringSubmatch(stripSpaces(line))
 		if len(matches) < 3 {
 			line = strings.TrimSpace(line)
 			if len(line) == 0 {
@@ -41,11 +42,9 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 			}
 			_, err := strconv.Atoi(line)
 			if err == nil {
-				// if the is no last line
-				if (i == 0 || // or the last line is empty or none
-					i > 0 && len(strings.TrimSpace(lines[i-1])) == 00) &&
-					// and if the next line is timecode
-					(i+1 < len(lines) && len(re.FindStringSubmatch(lines[i+1])) >= 3) {
+				// if the next line is timecode
+				if i+1 < len(lines) &&
+					len(re.FindStringSubmatch(stripSpaces(lines[i+1]))) >= 3 {
 					// then skip this seq number
 					continue
 				}
@@ -82,6 +81,17 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 
 	removeLastEmptyCaption(&res, nil)
 	return
+}
+
+func stripSpaces(line string) (r string) {
+	return strings.Map(func(r rune) rune {
+		if unicode.In(r, unicode.Number, unicode.Symbol,
+			unicode.Punct,
+			unicode.Dash, unicode.White_Space) {
+			return r
+		}
+		return -1
+	}, line)
 }
 
 func removeLastEmptyCaption(res *Subtitle, o *Caption) (removed bool) {

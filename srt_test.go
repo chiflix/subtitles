@@ -157,13 +157,37 @@ func TestParseExtraLineBreak(t *testing.T) {
 	assert.Equal(t, expected, res)
 }
 
+func TestStripSpaces(t *testing.T) {
+	in := "00:14:32.00 --> 00:14:39​​,284\r\n"
+	expected := "00:14:32.00 --> 00:14:39,284\r\n"
+	out := stripSpaces(in)
+
+	assert.Equal(t, expected, out)
+}
+
 func TestParseWierdTimestamp(t *testing.T) {
 	in := "1\r\n" +
 		"00:14:52.00 --> 00:14:57,500\r\n" +
+		"Go ninja!\r\n" +
+		"2\r\n" +
+		"00:14:32.00 --> 00:14:39​​,284\r\n" +
+		"Go ninja!\r\n" +
+		"3\r\n" +
+		"00:14:39​​,401 --> 00:14:57,500\r\n" +
 		"Go ninja!\r\n"
 	expected := Subtitle{[]Caption{{
 		1,
 		makeTime(0, 14, 52, 0),
+		makeTime(0, 14, 57, 500),
+		[]string{"Go ninja!"},
+	}, {
+		2,
+		makeTime(0, 14, 32, 0),
+		makeTime(0, 14, 39, 284),
+		[]string{"Go ninja!"},
+	}, {
+		3,
+		makeTime(0, 14, 39, 401),
 		makeTime(0, 14, 57, 500),
 		[]string{"Go ninja!"},
 	}}}

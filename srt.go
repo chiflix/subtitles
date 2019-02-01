@@ -19,7 +19,8 @@ func init() {
 }
 
 func looksLikeSRT(s string) bool {
-	if strings.HasPrefix(s, "1\n") || strings.HasPrefix(s, "1\r\n") {
+	caps, err := NewFromSRT(s)
+	if err == nil && len(caps.Captions) >= 1 {
 		return true
 	}
 	return false

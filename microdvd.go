@@ -17,8 +17,8 @@ func looksLikeMicroDVD(s string) bool {
 
 // NewFromMicroDVD parses a .sub text into Subtitle, assumes s is a clean utf8 string
 // set frameRate to -1 to detect framerate or guess
-func NewFromMicroDVD(s string, frameRate float64) (res Subtitle, err error) {
-	re := regexp.MustCompile(`^\{([0-9]+)\}\{([0-9]+)\}(.*)$`)
+func NewFromMicroDVD(s string, fps float64) (res Subtitle, err error) {
+	re := regexp.MustCompile(`\{([0-9]+)\}\{([0-9]+)\}(.*)$`)
 	lines := strings.Split(s, "\n")
 	outSeq := 1
 
@@ -28,15 +28,14 @@ func NewFromMicroDVD(s string, frameRate float64) (res Subtitle, err error) {
 			err = fmt.Errorf("microdvd: parse error at line %d (idx out of range)", i)
 			continue
 		}
-		if i == 0 && frameRate <= 0 {
-			fps, err := strconv.ParseFloat(matches[3], 64)
+		if i == 0 && fps <= 0 {
+			fps, err = strconv.ParseFloat(matches[3], 64)
 			if err != nil {
-				// there is not the framerate
+				// there is no framerate here
 				// use 23.976 by default
-				frameRate = 23.976
+				fps = 23.976
 				err = fmt.Errorf("microdvd: no frame rate assisned, use 23.976 by default ")
 			} else {
-				frameRate = fps
 				continue
 			}
 		}
@@ -51,8 +50,8 @@ func NewFromMicroDVD(s string, frameRate float64) (res Subtitle, err error) {
 			continue
 		}
 		var o Caption
-		o.Start = secondsToTime(float64(startFrame) / frameRate)
-		o.End = secondsToTime(float64(endFrame) / frameRate)
+		o.Start = secondsToTime(float64(startFrame) / fps)
+		o.End = secondsToTime(float64(endFrame) / fps)
 		o.Text = strings.Split(matches[3], "|")
 		o.Seq = outSeq
 		if len(o.Text) > 0 {

@@ -14,7 +14,9 @@ func Parse(s string) (sub Subtitle, err error) {
 			err = fmt.Errorf("parse: unrecognized subtitle type")
 		}
 	}()
-	if looksLikeSRT(s) {
+	if looksLikeMicroDVD(s) {
+		return NewFromMicroDVD(s, 0)
+	} else if looksLikeSRT(s) {
 		return NewFromSRT(s)
 	} else if looksLikeSSA(s) {
 		return NewFromSSA(s)

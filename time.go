@@ -2,6 +2,7 @@ package subtitles
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -46,4 +47,10 @@ func parseTime(in string) (time.Time, error) {
 	}
 
 	return makeTime(h, m, s, ms), nil
+}
+
+func secondsToTime(s float64) time.Time {
+	zero := makeTime(0, 0, 0, 00)
+	s = math.Round(s*1000) / 1000
+	return zero.Add(time.Duration(s * float64(time.Second)))
 }

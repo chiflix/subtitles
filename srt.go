@@ -28,7 +28,7 @@ func looksLikeSRT(s string) bool {
 
 // NewFromSRT parses a .srt text into Subtitle, assumes s is a clean utf8 string
 func NewFromSRT(s string) (res Subtitle, err error) {
-	re := regexp.MustCompile("([0-9]+:[0-9]+:[0-9]+,[0-9]+)\\s+-->\\s+([0-9]+:[0-9]+:[0-9]+,[0-9]+)")
+	re := regexp.MustCompile(`([0-9]+:*[0-9]+:[0-9]+[\.,]+[0-9]+)\s+-->\s+([0-9]+:*[0-9]+:[0-9]+[\.,]+[0-9]+)`)
 	lines := strings.Split(s, "\n")
 	outSeq := 1
 
@@ -44,7 +44,7 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 				// if the is no last line
 				if (i == 0 || // or the last line is empty or none
 					i > 0 && len(strings.TrimSpace(lines[i-1])) == 00) &&
-					// and the next line is timecode
+					// and if the next line is timecode
 					(i+1 < len(lines) && len(re.FindStringSubmatch(lines[i+1])) >= 3) {
 					// then skip this seq number
 					continue
@@ -72,11 +72,31 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 			break
 		}
 
-		res.Captions = append(res.Captions, o)
-		outSeq++
+		if removeLastEmptyCaption(&res, &o) {
+			outSeq--
+		} else {
+			res.Captions = append(res.Captions, o)
+			outSeq++
+		}
 	}
 
+	removeLastEmptyCaption(&res, nil)
 	return
+}
+
+func removeLastEmptyCaption(res *Subtitle, o *Caption) (removed bool) {
+	ll := len(res.Captions)
+	if ll > 0 && len(res.Captions[ll-1].Text) == 0 {
+		// remove the last caption if it was empty
+		if o != nil {
+			o.Seq--
+			res.Captions[ll-1] = *o
+		} else {
+			res.Captions = res.Captions[:ll-1]
+		}
+		return true
+	}
+	return false
 }
 
 // AsSRT renders the sub in .srt format

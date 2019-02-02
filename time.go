@@ -20,6 +20,10 @@ func parseTime(in string) (time.Time, error) {
 	in = strings.Replace(in, ",", ":", -1)
 	in = strings.Replace(in, ".", ":", -1)
 
+	if strings.Count(in, ":") == 1 {
+		in = "00:" + in
+	}
+
 	if strings.Count(in, ":") == 2 {
 		in += ":000"
 	}

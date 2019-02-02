@@ -14,6 +14,7 @@ func TestParseTime(t *testing.T) {
 	t5, _ := parseTime("00:00:0,500")
 	t6, _ := parseTime("00:00:2,00")
 	t7, _ := parseTime("00:14:52.12")
+	t8, _ := parseTime("40:22")
 
 	assert.Equal(t, makeTime(18, 40, 22, 110), t1)
 	assert.Equal(t, makeTime(18, 40, 22, 110), t2)
@@ -22,6 +23,7 @@ func TestParseTime(t *testing.T) {
 	assert.Equal(t, makeTime(0, 0, 0, 500), t5)
 	assert.Equal(t, makeTime(0, 0, 2, 0), t6)
 	assert.Equal(t, makeTime(0, 14, 52, 12), t7)
+	assert.Equal(t, makeTime(0, 40, 22, 0), t8)
 }
 
 func TestNewFromSRT(t *testing.T) {

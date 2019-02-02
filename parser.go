@@ -20,6 +20,8 @@ func Parse(s string) (sub Subtitle, err error) {
 		return NewFromSRT(s)
 	} else if looksLikeSSA(s) {
 		return NewFromSSA(s)
+	} else if looksLikeTMPlayerTXT(s) {
+		return NewFromTMPlayerTXT(s)
 	} else if looksLikeCCDBCapture(s) {
 		return NewFromCCDBCapture(s)
 	} else if looksLikeDCSub(s) {

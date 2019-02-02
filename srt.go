@@ -28,7 +28,8 @@ func looksLikeSRT(s string) bool {
 }
 
 // NewFromSRT parses a .srt text into Subtitle, assumes s is a clean utf8 string
-func NewFromSRT(s string) (res Subtitle, err error) {
+func NewFromSRT(s string) (res Subtitle, errs []error) {
+	var err error
 	re := regexp.MustCompile(`([0-9]+:*[0-9]+:[0-9]+[\.,]+[0-9]+)\s+-->\s+([0-9]+:*[0-9]+:[0-9]+[\.,]+[0-9]+)`)
 	lines := strings.Split(s, "\n")
 	outSeq := 1
@@ -62,12 +63,14 @@ func NewFromSRT(s string) (res Subtitle, err error) {
 		o.Start, err = parseTime(matches[1])
 		if err != nil {
 			err = fmt.Errorf("srt: start error at line %d: %v", i, err)
+			errs = append(errs, err)
 			break
 		}
 
 		o.End, err = parseTime(matches[2])
 		if err != nil {
 			err = fmt.Errorf("srt: end error at line %d: %v", i, err)
+			errs = append(errs, err)
 			break
 		}
 

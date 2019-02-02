@@ -17,8 +17,9 @@ func looksLikeMicroDVD(s string) bool {
 
 // NewFromMicroDVD parses a .sub text into Subtitle, assumes s is a clean utf8 string
 // set frameRate to -1 to detect framerate or guess
-func NewFromMicroDVD(s string, fps float64) (res Subtitle, err error) {
-	re := regexp.MustCompile(`\{([0-9]+)\}\{([0-9]+)\}(.*)$`)
+func NewFromMicroDVD(s string, fps float64) (res Subtitle, errs []error) {
+	var err error
+	re := regexp.MustCompile(`[\{\[]+([0-9]+)[\}\]]+[\{\[]+([0-9]+)[\}\]]+(.*)$`)
 	lines := strings.Split(s, "\n")
 	outSeq := 1
 
@@ -26,6 +27,7 @@ func NewFromMicroDVD(s string, fps float64) (res Subtitle, err error) {
 		matches := re.FindStringSubmatch(line)
 		if len(matches) < 4 {
 			err = fmt.Errorf("microdvd: parse error at line %d (idx out of range)", i)
+			errs = append(errs, err)
 			continue
 		}
 		if i == 0 && fps <= 0 {
@@ -34,7 +36,8 @@ func NewFromMicroDVD(s string, fps float64) (res Subtitle, err error) {
 				// there is no framerate here
 				// use 23.976 by default
 				fps = 23.976
-				err = fmt.Errorf("microdvd: no frame rate assisned, use 23.976 by default ")
+				err = fmt.Errorf("microdvd: no frame rate assigned, use 23.976 by default ")
+				errs = append(errs, err)
 			} else {
 				continue
 			}
@@ -42,11 +45,13 @@ func NewFromMicroDVD(s string, fps float64) (res Subtitle, err error) {
 		startFrame, err := strconv.Atoi(matches[1])
 		if err != nil {
 			err = fmt.Errorf("microdvd: parse error at line %d (start frame is not int)", i)
+			errs = append(errs, err)
 			continue
 		}
 		endFrame, err := strconv.Atoi(matches[2])
 		if err != nil {
 			err = fmt.Errorf("microdvd: parse error at line %d (end frame is not int)", i)
+			errs = append(errs, err)
 			continue
 		}
 		var o Caption

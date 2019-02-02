@@ -29,8 +29,9 @@ func looksLikeTMPlayerTXT(s string) bool {
 }
 
 // NewFromTMPlayerTXT ...
-func NewFromTMPlayerTXT(s string) (res Subtitle, err error) {
-	re := regexp.MustCompile(`([0-9]*:*[0-9]+:[0-9]+):(.*)`)
+func NewFromTMPlayerTXT(s string) (res Subtitle, errs []error) {
+	var err error
+	re := regexp.MustCompile(`([0-9]+:[0-9]+:[0-9]+):(.*)`)
 	lines := strings.Split(s, "\n")
 	outSeq := 1
 
@@ -44,7 +45,8 @@ func NewFromTMPlayerTXT(s string) (res Subtitle, err error) {
 		o.Seq = outSeq
 		o.Start, err = parseTime(matches[1])
 		if err != nil {
-			fmt.Errorf("srt: start error at line %d: %v", i, err)
+			err = fmt.Errorf("srt: start error at line %d: %v", i, err)
+			errs = append(errs, err)
 			continue
 		}
 		ll := len(res.Captions)

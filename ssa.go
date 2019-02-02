@@ -63,7 +63,7 @@ func NewFromSSA(s string) (res Subtitle, err error) {
 			continue
 		}
 
-		o.Text = strings.Split(text, "\\n")
+		o.Text = strings.Split(text, "\\N")
 
 		if len(o.Text) > 0 {
 			res.Captions = append(res.Captions, o)

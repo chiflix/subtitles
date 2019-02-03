@@ -85,7 +85,7 @@ func parseSsaDialogue(s string, idx int, columns int) string {
 
 	s = s[pos+2:]
 	cols := strings.SplitN(s, ",", columns)
-	if idx >= len(cols) {
+	if idx >= len(cols) || idx <= 0 {
 		return ""
 	}
 	return strings.TrimSpace(cols[idx])
@@ -144,7 +144,7 @@ func parseSsaTime(in string) (time.Time, error) {
 	matches := r1.FindStringSubmatch(in)
 
 	if len(matches) < 5 {
-		return time.Now(), fmt.Errorf("[srt] Regexp didnt match: %s", in)
+		return time.Now(), fmt.Errorf("[ssa] Regexp didnt match: %s", in)
 	}
 
 	h, err := strconv.Atoi(matches[1])

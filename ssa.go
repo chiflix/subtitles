@@ -27,6 +27,9 @@ func NewFromSSA(s string) (res Subtitle, err error) {
 
 	lines := strings.Split(chunk, "\n")
 
+	if len(lines) <= 0 {
+		return
+	}
 	// first line must now be a  "Format:"
 	format := lines[0]
 
@@ -76,7 +79,7 @@ func NewFromSSA(s string) (res Subtitle, err error) {
 // return column idx from s
 func parseSsaDialogue(s string, idx int, columns int) string {
 	pos := strings.Index(s, ": ")
-	if pos == -1 {
+	if pos == -1 || pos+2 >= len(s) {
 		return ""
 	}
 
@@ -90,7 +93,7 @@ func parseSsaDialogue(s string, idx int, columns int) string {
 
 func parseSsaFormat(s string, colName string) int {
 	pos := strings.Index(s, ": ")
-	if pos == -1 {
+	if pos == -1 || pos+2 >= len(s) {
 		return -1
 	}
 
@@ -111,7 +114,7 @@ func parseSsaFormat(s string, colName string) int {
 
 func columnCountFromSsaFormat(s string) int {
 	pos := strings.Index(s, ": ")
-	if pos == -1 {
+	if pos == -1 || pos+2 >= len(s) {
 		return -1
 	}
 

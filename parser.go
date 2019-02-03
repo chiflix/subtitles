@@ -32,7 +32,6 @@ func Parse(s string) (sub Subtitle, err error) {
 		}
 	}
 	if key >= 0 {
-		fmt.Println(key)
 		return res[key], nil
 	}
 	return Subtitle{}, fmt.Errorf("parse: unrecognized subtitle type")

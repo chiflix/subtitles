@@ -53,6 +53,12 @@ func NewFromSSA(s string) (res Subtitle, err error) {
 		end := parseSsaDialogue(lines[i], endCol, dialogueColumns)
 		text := parseSsaDialogue(lines[i], textCol, dialogueColumns)
 
+		if len(start) <= 0 ||
+			len(end) <= 0 ||
+			len(text) <= 0 {
+			continue
+		}
+
 		var o Caption
 		o.Seq = outSeq
 		o.Start, err = parseSsaTime(start)
